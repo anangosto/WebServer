@@ -1,0 +1,48 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: my_wordpress_container
+    ports:
+      - 8080:80
+      - 8082:22
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    container_name: my_mysql_container
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - mysql:/var/lib/mysql
+
+  python_script:
+    build:
+      context: .
+      dockerfile: Dockerfile1
+    container_name: my_python_container
+    volumes:
+      - ./script.py:/script.py
+    depends_on:
+      - wordpress
+      - mysql
+
+
+volumes:
+  wordpress:
+  mysql:
